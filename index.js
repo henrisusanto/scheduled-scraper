@@ -23,7 +23,7 @@ app.listen(port, () => {
 
 function doScrape() {
   setTimeout(() => {
-    scrape()
+    writeLog(new Date())// scrape()
     doScrape()
   }, interval)
 }
