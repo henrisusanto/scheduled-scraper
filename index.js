@@ -4,7 +4,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 const interval = 10000
-const logfile = './scrape.log'
+const logfile = `${__dirname}/scrape.log`
 const logMaxLine = 5
 
 app.get('/', async (req, res) => {
