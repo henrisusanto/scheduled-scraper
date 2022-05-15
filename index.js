@@ -1,19 +1,11 @@
 const Nightmare = require('nightmare')
-const fs = require('fs')
 const express = require('express')
 const app = express()
 const port = 3000
-const interval = 10000
-const logfile = `${__dirname}/scrape.log`
-const logMaxLine = 5
+const interval = 60000
 
 app.get('/', async (req, res) => {
-  fs.readFile(logfile, 'utf8', async (err, data) => {
-    if (err) res.send(err)
-    else {
-      res.send(data.split('\n').join('<br>'))
-    }
-  })
+  res.send(200)
 })
 
 app.listen(port, () => {
@@ -23,40 +15,32 @@ app.listen(port, () => {
 
 function doScrape() {
   setTimeout(() => {
-    writeLog(new Date())// scrape()
+    scrape()
     doScrape()
   }, interval)
 }
 
 function scrape() {
-  var log = `startedAt: ${new Date()}`
   const nightmare = Nightmare({ show: false, image: false })
   nightmare
-    .goto('https://time.is/id/')
-    .wait('time')
-    .evaluate(() => {
-      var time = []
-      for (span of document.querySelectorAll('time span')) time.push(span.innerHTML)
-      return time.join('')
-    })
+    .goto('https://twitter.com/')
+    .wait('[href="/login"]')
+    .click('[href="/login"]')
+    .wait('[name="text"]')
+    .type('[name="text"]', 'liemgioktian18')
+    .click('[role="button"]:nth-child(6)')
+    .wait('[name="password"]')
+    .type('[name="password"]', 'x123123x')
+    .click('[data-testid="LoginForm_Login_Button"]')
+    .wait('[data-offset-key].public-DraftStyleDefault-block.public-DraftStyleDefault-ltr')
+    .click('[data-offset-key].public-DraftStyleDefault-block.public-DraftStyleDefault-ltr')
+    .type('[data-offset-key].public-DraftStyleDefault-block.public-DraftStyleDefault-ltr', new Date())
+    .click('[data-testid="tweetButtonInline"]')
     .end()
-    .then((result) => {
-      log += ` - endedAt: ${new Date()}`
-      log += ` | result: ${result}`
-      writeLog(log)
+    .then(result => {
+      console.log('done', new Date())
     })
     .catch(error => {
       console.error('Search failed:', error)
     })
-}
-
-async function writeLog(content) {
-  fs.readFile(logfile, 'utf8', (err, data) => {
-    var lines = data.split('\n')
-    lines.push(content)
-    lines = lines.slice(Math.max(lines.length - logMaxLine, 0))
-    fs.writeFile(logfile, lines.join('\n'), err => {
-      if (err) console.error(err)
-    })
-  })
 }
