@@ -3,7 +3,10 @@
     "builds": [
         {
             "src": "./index.js",
-            "use": "@vercel/node"
+            "use": "@vercel/node",
+            "config": {
+                "includeFiles": "./scrape.log"
+            }
         }
     ],
     "routes": [
@@ -11,10 +14,5 @@
             "src": "/(.*)",
             "dest": "/"
         }
-    ],
-    "functions": {
-        "index.js": {
-            "includeFiles": "./scrape.log"
-        }
-    }
+    ]
 }
